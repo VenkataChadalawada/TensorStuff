@@ -17,7 +17,7 @@
 `data.add(otherData)`
 
 ###### 2D operations
-```js const data = tf.tensor([[1,2,3], [4,5,6]]);
+``` const data = tf.tensor([[1,2,3], [4,5,6]]);
 const otherData = tf.tensor([[4,5,6], [1,2,3]]);
 
 data.add(otherData) ```
@@ -139,7 +139,7 @@ const data1 = tf.tensor([
   [10,20,30],
   [50,60,80]
 ]);
-```
+
 data1.slice([0,1],[8,1])
 o/p:
 [[20], [60], [20], [60], [20], [60], [20], [60]]
@@ -229,3 +229,4 @@ jumpData.sum(1).expandDims().shape //1,4
 jumpData.sum(1).expandDims(1).shape //4,1
 //solving same problem with expand dims
 jumpData.sum(1).expandDims(1).concat(playerData,1)
+```
