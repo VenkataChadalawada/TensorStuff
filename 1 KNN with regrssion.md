@@ -133,3 +133,157 @@ features.sub(predictionPoint).pow(2).sum(1).pow(0.5).expandDims(1).concat(labels
 ).slice(0,k).reduce((acc, pair) => (acc+pair.get(1)),0) / k;
 //o/p = 220
 ```
+
+
+## Practical Nodejs example
+```javascript
+require('@tensorflow/tfjs-node'); // for CPU - some other calculations might be needed for GPU
+const tf = require('@tensorflow/tfjs');
+const loadCSV = require('./load-csv')
+
+let {features, labels, testFeatures, testLabels} = loadCSV('kc_house_data.csv', {
+    shuffle: true,
+    splitTest: 10,
+    dataColumns: ['lat', 'long', 'sqft_lot', 'sqft_living'],
+    labelColumns: ['price']
+});
+
+//console.log(testFeatures);
+//console.log(testLabels);
+
+function knn(features, labels, predictionPoint, k){
+    //Applying standardization
+    const { mean, variance } = tf.moments(features, 0);
+    // mean and variance = [47.5600243, -122.2137985]
+    // console.log('==============', tf.moments(features, 0)['mean'].print());
+    //console.log('--before--', predictionPoint.print());
+    // [47.5610008, -122.2259979]
+    const scaledPrediction = predictionPoint.sub(mean).div(variance.pow(0.5));
+    //console.log('--after--', scaledPrediction.print());
+    //  [0.0070479, -0.0866189]
+    return features
+        .sub(mean)
+        .div(variance.pow(0.5))
+        .sub(scaledPrediction)
+        .pow(2)
+        .sum(1)
+        .pow(0.5)
+        .expandDims(1)
+        .concat(labels,1)
+        .unstack()
+        .sort((a,b) => a.get(0)>b.get(0)?1:-1)
+        .slice(0,k)
+        .reduce((acc, pair) => (acc+pair.get(1)),0)/k;
+}
+
+
+
+/*
+// For one value
+const result = knn(features, labels, tf.tensor(testFeatures[0]), 10);
+console.log('Guess--', result, testLabels[0][0]);
+//Guess-- 1421200 1085000
+// It seems a big variation
+
+//error = (expectedValue-predictedValue) / expectedValue
+
+//const err = (testLabels[0][0]-result)/testLabels[0][0];
+//console.log('Error', err*100);
+*/
+// console.log('Guess--', result, testLabels[0][0]);
+//Guess-- 1421200 1085000
+// It seems a big variation
+/*
+error = (expectedValue-predictedValue) / expectedValue
+ */
+// running out test set on our result
+
+features = tf.tensor(features);
+labels = tf.tensor(labels);
+
+testFeatures.forEach((testPoint, i) => {
+    const result = knn(features, labels, tf.tensor(testPoint), 10);
+    const err = (testLabels[i][0]-result)/testLabels[i][0];
+    console.log('Error', err*100);
+});
+
+/* output:-
+    Error -30.98617511520737
+    Error -52.95661953727506
+    Error -9.552941176470588
+    Error -28.528495575221243
+    Error -6.069828722002635
+    Error -9.855653270993358
+    Error -11.176432291666668
+    Error 43.34094616639478
+    Error -19.536472310319592
+    Error -5.603238866396762
+ */
+
+// We should consider some other columns as well
+
+// Normalization (or) Standardization
+// we use if they are all in similar range no big outliers
+// Incase we have outliers we should do standardization which eliminates few outliers
+/*
+Standardization = (value-average) / Standard Deviation
+// note :  stddev = sqrt(variance)
+ */
+// if we think in tensorflow way , every column we have to calculate separately average and std dev
+/* example-----
+
+const numbers = tf.tensor([
+  [1,2],
+  [3,4],
+  [5,6]
+ ]);
+const {mean, variance} = tf.moments(numbers, 0)
+//mean
+//variance
+// something is wrong we should get column wise
+
+numbers.sub(mean).div(variance.pow(0.5))
+ */
+// applied standardization in knn function & added 'sqft_lot' column
+// after that output looks as:
+/*
+Error -14.751152073732717
+Error -64.06107540702656
+Error -99.68823529411765
+Error -38.36141592920354
+Error -2.9604743083003955
+Error -0.3845470293790806
+Error -6.091796875
+Error 49.44861337683524
+Error -18.761893144669433
+Error 1.6740890688259111
+
+ */
+
+// Debugging
+
+// node --inspect-brk index.js // run this in console and open chrome
+// chrome://inspect/#devices
+
+//In console check ---
+//features.shape
+//features.print()
+//predictionPoint.print()
+
+//hmm debugging looks fine - may be alter value of K or add more features and see
+// after added sqft_living
+/*
+Error -15.323502304147466
+Error -11.344580119965723
+Error -2.047058823529412
+Error 19.327433628318584
+Error 7.806324110671936
+Error -14.106372465729613
+Error -8.782552083333334
+Error 13.227406199021207
+Error -36.336911441815076
+Error 7.381578947368421
+
+ */
+
+```
