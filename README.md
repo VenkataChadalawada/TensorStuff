@@ -242,3 +242,59 @@ jumpData.sum(1).expandDims(1).shape //4,1
 //solving same problem with expand dims
 jumpData.sum(1).expandDims(1).concat(playerData,1)
 ```
+
+# Linear Regression / Multilinear Regression
+- Predicts continuous values which can be constructed with multi dimensional linear fashion
+## Steps to be considered
+### 1) Getting data into JS world from csv or xls or whatever
+``` javascript
+let { features, labels, testFeatures, testLabels } = loadCSV('./cars.csv', {
+    shuffle: true,
+    splitTest: 50,
+    dataColumns: ['horsepower', 'weight', 'displacement'],
+    labelColumns: ['mpg']
+});
+```
+### 2) Model Class
+##### main Methods
+- constructor()
+- processfeatures(features)
+- train()
+- test(testFeatures, testLabels)
+- predict(observations)
+
+##### helper Methods
+- gradientDescent(features, labels)
+- standardize(features)
+- recordMSE()
+- updateLearningRate()
+
+### 3) Running the Model class
+```
+const regression = new LinearRegression(features, labels, {
+    learningRate: 0.1,
+    iterations: 3,
+    batchSize: 10
+});
+// train 
+regression.train();
+
+// test - Rsquared (closer to 1 gives better)
+const R2 = regression.test(testFeatures, testLabels);
+console.log('----R2 is ---------', R2);
+
+// Plot / Data Visualization to understand the model
+plot({
+    x: regression.mseHistory.reverse(),
+    xLabel: 'Iteration#',
+    yLabel: 'Mean Squared Error'
+}); 
+
+// Prediction - for new labels
+regression.predict([
+    [120, 2, 380],
+    [135, 2.1, 420]
+]).print();
+```
+
+# Logistic Regression
