@@ -298,3 +298,39 @@ regression.predict([
 ```
 
 # Logistic Regression
+predicts discrete values - classification
+Basic Logistic regression
+##### 1) Binary classification:
+###### Example
+- Pass or not
+- Spam or not
+- customer accepts or customer declines
+- apple phone or android phone
+
+Given a persons age, gender , do they prefer read books or watch movies?
+
+we need find a mathematical relationship (FORMULA) between those parameters to predict it
+say 
+`preference = m1 * Age + m2 * gender + b`
+
+
+##### 2) Multinomial Logistic Regression
+
+
+
+# Binary Logistic Regression
+
+# Multinomial Logistic Regression
+
+
+# Image Recognition
+Given the pixel intensity values in an image identify whether the charecter is a hand-written 0,1,2,3,4,5,6,7,8,9
+MNIST DataSet // famous in ML world
+Trainig Set - 60,000 Images
+Testing Set - 20,000 Images
+
+Every image is collection of pixels
+Representing them in greyscale white to black as 0->255
+
+
+
