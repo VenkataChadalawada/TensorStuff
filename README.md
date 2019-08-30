@@ -270,7 +270,7 @@ let { features, labels, testFeatures, testLabels } = loadCSV('./cars.csv', {
 - updateLearningRate()
 
 ### 3) Running the Model class
-```
+``` javascript
 const regression = new LinearRegression(features, labels, {
     learningRate: 0.1,
     iterations: 3,
