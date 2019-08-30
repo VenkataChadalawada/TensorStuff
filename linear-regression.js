@@ -5,6 +5,7 @@ class LinearRegression {
         this.features = this.processfeatures(features);
         this.labels = tf.tensor(labels);
         this.mseHistory = [];
+        this.bHistory = [];
         this.options = Object.assign({ learningRate: 0.1, iterations: 1000 }, options);
         this.weights = tf.zeros([this.features.shape[1], 1]); // for m and b
     }
@@ -23,6 +24,7 @@ class LinearRegression {
     }
     train(){
         for(let i=0; i<this.options.iterations; i++){
+            this.bHistory.push(Array.from(this.weights.dataSync())[0]);
             console.log('===',this.options.learningRate);
             this.gradientDescent();
             this.recordMSE();
@@ -48,7 +50,7 @@ class LinearRegression {
         const arr = Array.from(rsquareValue);
         // console.log(rsquareValue);
         console.log('-----rsquareValue----', arr[0]);
-                  
+        return arr[0];          
     }
     // Data preprocessing - Standarization
     processfeatures(features) {
@@ -83,7 +85,7 @@ class LinearRegression {
         const mseValue = mse.dataSync();
         const mse_val = Array.from(mseValue);
         // console.log('=========MSE===', MSE);
-        this.mseHistory.unshift(mse_val);
+        this.mseHistory.unshift(mse_val[0]);
     }
 
     updateLearningRate(){
